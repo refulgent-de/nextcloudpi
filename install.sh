@@ -5,6 +5,8 @@
 # Copyleft 2017 by Ignacio Nunez Hernanz <nacho _a_t_ ownyourbits _d_o_t_ com>
 # GPL licensed (see end of file) * Use at your own risk!
 #
+# Extended by javanaut@refulgent.de
+#
 # Usage: ./install.sh
 #
 # more details at https://ownyourbits.com
@@ -14,8 +16,10 @@ BRANCH=master
 
 set -e$DBG
 
+UNINSTALL_SCRIPT=$HOME
+
 TMPDIR="$(mktemp -d /tmp/nextcloudpi.XXXXXX || (echo "Failed to create temp dir. Exiting" >&2 ; exit 1) )"
-trap "rm -rf \"${TMPDIR}\" ; exit 0" 0 1 2 3 15
+#trap "rm -rf \"${TMPDIR}\" ; exit 0" 0 1 2 3 15
 
 [[ ${EUID} -ne 0 ]] && {
   printf "Must be run as root. Try 'sudo $0'\n"
@@ -32,6 +36,7 @@ echo "Getting build code..."
 apt-get update
 apt-get install --no-install-recommends -y wget ca-certificates sudo lsb-release
 
+# TODO update
 pushd "$TMPDIR"
 wget -qO- --content-disposition https://github.com/nextcloud/nextcloudpi/archive/"$BRANCH"/latest.tar.gz \
   | tar -xz \
@@ -55,7 +60,7 @@ cp etc/ncp-config.d/nc-nextcloud.cfg /usr/local/etc/ncp-config.d/
 cp etc/library.sh /usr/local/etc/
 cp etc/ncp.cfg /usr/local/etc/
 
-install_app    lamp.sh
+install_app    lemp.sh
 install_app    bin/ncp/CONFIG/nc-nextcloud.sh
 run_app_unsafe bin/ncp/CONFIG/nc-nextcloud.sh
 systemctl restart mysqld # TODO this shouldn't be necessary, but somehow it's needed in Debian 9.6. Fixme
