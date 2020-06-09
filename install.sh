@@ -16,10 +16,11 @@ BRANCH=master
 
 set -e$DBG
 
-UNINSTALL_SCRIPT=$HOME
+USG_SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+source etc/uninstaller-library.sh #US
 
 TMPDIR="$(mktemp -d /tmp/nextcloudpi.XXXXXX || (echo "Failed to create temp dir. Exiting" >&2 ; exit 1) )"
-#trap "rm -rf \"${TMPDIR}\" ; exit 0" 0 1 2 3 15
+trap "rm -rf \"${TMPDIR}\" ; exit 0" 0 1 2 3 15 # DEBUG
 
 [[ ${EUID} -ne 0 ]] && {
   printf "Must be run as root. Try 'sudo $0'\n"
@@ -32,16 +33,15 @@ export PATH="/usr/local/sbin:/usr/sbin:/sbin:${PATH}"
 type mysqld  &>/dev/null && echo ">>> WARNING: existing mysqld configuration will be changed <<<"
 
 # get install code
-echo "Getting build code..."
-apt-get update
-apt-get install --no-install-recommends -y wget ca-certificates sudo lsb-release
+#echo "Getting build code..."
+usg_install wget ca-certificates sudo lsb-release
 
-# TODO update
-pushd "$TMPDIR"
-wget -qO- --content-disposition https://github.com/nextcloud/nextcloudpi/archive/"$BRANCH"/latest.tar.gz \
-  | tar -xz \
-  || exit 1
-cd - && cd "$TMPDIR"/nextcloudpi-"$BRANCH"
+# DEBUG
+#pushd "$TMPDIR"
+#wget -qO- --content-disposition https://github.com/nextcloud/nextcloudpi/archive/"$BRANCH"/latest.tar.gz \
+#  | tar -xz \
+#  || exit 1
+#cd - && cd "$TMPDIR"/nextcloudpi-"$BRANCH"
 
 # install NCP
 echo -e "\nInstalling NextCloudPi..."
@@ -54,24 +54,34 @@ check_distro etc/ncp.cfg || {
   exit 1;
 }
 
-
 mkdir -p /usr/local/etc/ncp-config.d/
+echo "rm -rf /usr/local/etc/ncp-config.d/" >>$USG_UNINSTALL_SCRIPT
+
 cp etc/ncp-config.d/nc-nextcloud.cfg /usr/local/etc/ncp-config.d/
 cp etc/library.sh /usr/local/etc/
+echo "rm /usr/local/etc/library.sh" >>$USG_UNINSTALL_SCRIPT
+
 cp etc/ncp.cfg /usr/local/etc/
+echo "rm /usr/local/etc/ncp.cfg" >>$USG_UNINSTALL_SCRIPT
+
 
 install_app    lemp.sh
-install_app    bin/ncp/CONFIG/nc-nextcloud.sh
-run_app_unsafe bin/ncp/CONFIG/nc-nextcloud.sh
-systemctl restart mysqld # TODO this shouldn't be necessary, but somehow it's needed in Debian 9.6. Fixme
-install_app    ncp.sh
-run_app_unsafe bin/ncp/CONFIG/nc-init.sh
-bash /usr/local/bin/ncp-provisioning.sh
+#install_app    bin/ncp/CONFIG/nc-nextcloud.sh
+#run_app_unsafe bin/ncp/CONFIG/nc-nextcloud.sh
+#systemctl restart mysqld # TODO this shouldn't be necessary, but somehow it's needed in Debian 9.6. Fixme
+#install_app    ncp.sh
+#run_app_unsafe bin/ncp/CONFIG/nc-init.sh
+#bash /usr/local/bin/ncp-provisioning.sh
 
-popd
+#popd # DEBUG
 
 IFACE="$( ip r | grep "default via" | awk '{ print $5 }' | head -1 )"
 IP="$( ip a show dev "$IFACE" | grep global | grep -oP '\d{1,3}(.\d{1,3}){3}' | head -1 )"
+
+echo "iface=$IFACE"
+echo "ip=$IP"
+
+usg_finalize
 
 echo "Done.
 
