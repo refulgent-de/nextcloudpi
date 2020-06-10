@@ -33,20 +33,10 @@ install() {
   usg_install -t $RELEASE php${PHPVER} php${PHPVER}-curl php${PHPVER}-gd php${PHPVER}-fpm php${PHPVER}-cli php${PHPVER}-opcache \
                             php${PHPVER}-mbstring php${PHPVER}-xml php${PHPVER}-zip php${PHPVER}-fileinfo php${PHPVER}-ldap \
                             php${PHPVER}-intl php${PHPVER}-bz2 php${PHPVER}-json
+
+  usg_mkdir /run/php
 }
 
-#install()
-##{
-#    apt-get update
-#    $APTINSTALL apt-utils cron curl
-#    $APTINSTALL apache2
-#
-#    $APTINSTALL -t $RELEASE php${PHPVER} php${PHPVER}-curl php${PHPVER}-gd php${PHPVER}-fpm php${PHPVER}-cli php${PHPVER}-opcache \
-#                            php${PHPVER}-mbstring php${PHPVER}-xml php${PHPVER}-zip php${PHPVER}-fileinfo php${PHPVER}-ldap \
-#                            php${PHPVER}-intl php${PHPVER}-bz2 php${PHPVER}-json
-#
-#    mkdir -p /run/php
-#
 #    # mariaDB password
 #    local DBPASSWD="default"
 #    echo -e "[client]\npassword=$DBPASSWD" > /root/.my.cnf

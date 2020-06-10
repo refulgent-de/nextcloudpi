@@ -69,6 +69,12 @@ usg_install() {
   done
 }
 
+usg_mkdir() {
+  [[ ! -d "$1" ]] &&
+    echo "rm -rf $1" >> $USG_UNINSTALL_SCRIPT
+  mkdir -p "$1"
+}
+
 usg_finalize() {
   echo -en "\n" >> $USG_UNINSTALL_SCRIPT
   echo "apt-get autoremove --purge" >> $USG_UNINSTALL_SCRIPT
