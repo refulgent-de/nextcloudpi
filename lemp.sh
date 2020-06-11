@@ -19,10 +19,11 @@
 # More at https://ownyourbits.com/2017/02/13/nextcloud-ready-raspberry-pi-image/
 #
 
-source /usr/local/etc/library.sh # sets PHPVER RELEASE
+#source /usr/local/etc/library.sh # sets PHPVER RELEASE
+source etc/library.sh # sets PHPVER RELEASE # DEBUG
+
 source etc/uninstaller-library.sh #US
 
-#APTINSTALL="apt-get install -y --no-install-recommends" # DEBUG
 export DEBIAN_FRONTEND=noninteractive
 
 install() {
@@ -35,13 +36,16 @@ install() {
                             php${PHPVER}-intl php${PHPVER}-bz2 php${PHPVER}-json
 
   usg_mkdir /run/php
+
+  # mariaDB password
+  usg_touch /root/.my.cnf
+  #echo -e "[client]\npassword=$DBPASSWD" > /root/.my.cnf # TODO diff # DEBUG
+  #chmod 600 /root/.my.cnf
+
+  # http://manpages.ubuntu.com/manpages/cosmic/de/man1/debconf-set-selections.1.html
 }
 
-#    # mariaDB password
-#    local DBPASSWD="default"
-#    echo -e "[client]\npassword=$DBPASSWD" > /root/.my.cnf
-#    chmod 600 /root/.my.cnf
-#
+
 #    debconf-set-selections <<< "mariadb-server-5.5 mysql-server/root_password password $DBPASSWD"
 #    debconf-set-selections <<< "mariadb-server-5.5 mysql-server/root_password_again password $DBPASSWD"
 #    $APTINSTALL mariadb-server php${PHPVER}-mysql

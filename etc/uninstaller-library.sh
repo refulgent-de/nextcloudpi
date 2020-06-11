@@ -3,6 +3,9 @@
 # Uninstall-Skript Generator 0.1.0
 #
 # Author: javanaut@refulgent.de
+#
+# Requirements:
+# 	Bash >= 4.2
 
 APT_VERSION_MATCH="[^[:blank:]]+[[:blank:]]+([^[:blank:]]+)"
 
@@ -28,6 +31,26 @@ if [[ $USG_STATUS != "OK" ]]; then
   USG_STATUS="OK"
 fi
 
+usg_appendTrailingSlash() {
+  
+  local pathString=${1}
+
+  # Author: github.com/edannenberg
+  [[ "${pathString}" != */ ]] && pathString="${pathString}/"
+
+  echo "$pathString"
+}
+
+usg_removeTrailingSlash() {
+
+  local pathString=${1}
+
+  # Author: github.com/edannenberg
+  [[ "${pathString}" == */ ]] && pathString="${pathString: : -1}"
+  
+  echo "$pathString"
+}
+
 usg_getInstalledVersion() {
 
   if [[ ${USG_INSTALLED_PACKAGES[$1]+_} ]]; then
@@ -43,13 +66,12 @@ usg_getInstalledVersion() {
 
 usg_install() {
 
-  unset APT_OPTIONS
+  local APT_OPTIONS
   local OPTIND o
   while getopts "t:" o; do 
     case "${o}" in
       t)
-        APT_OPTIONS="-t ${OPTARG}"
-        echo $APT_OPTIONS
+        APT_OPTIONS=" -t ${OPTARG}"
         ;;
     esac
   done
@@ -61,7 +83,7 @@ usg_install() {
     version="$(usg_getInstalledVersion $package)"
 
     if [[ -z "$version" ]]; then
-      echo "apt-get install -y --no-install-recommends $APT_OPTIONS $package"
+      #apt-get install -y --no-install-recommends$APT_OPTIONS $package
       echo "apt-get purge $package" >> $USG_UNINSTALL_SCRIPT
     fi
       
@@ -72,7 +94,21 @@ usg_install() {
 usg_mkdir() {
   [[ ! -d "$1" ]] &&
     echo "rm -rf $1" >> $USG_UNINSTALL_SCRIPT
-  mkdir -p "$1"
+  #mkdir -p "$1"
+}
+
+usg_touch() {
+  [[ ! -f "$1" ]] &&
+    echo "rm $1" >> $USG_UNINSTALL_SCRIPT
+  #touch "$1"
+}
+
+usg_cp() {
+
+  local targetFile="$(dirname $1)/$(basename $2)"
+  [[ ! -f "$targetFile" ]] &&
+    echo "rm $targetFile" >>$USG_UNINSTALL_SCRIPT
+  #cp $1 $2
 }
 
 usg_finalize() {

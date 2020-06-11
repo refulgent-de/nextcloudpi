@@ -11,6 +11,7 @@
 #
 # more details at https://ownyourbits.com
 
+
 BRANCH=master
 #DBG=x
 
@@ -18,6 +19,7 @@ set -e$DBG
 
 USG_SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source etc/uninstaller-library.sh #US
+
 
 TMPDIR="$(mktemp -d /tmp/nextcloudpi.XXXXXX || (echo "Failed to create temp dir. Exiting" >&2 ; exit 1) )"
 trap "rm -rf \"${TMPDIR}\" ; exit 0" 0 1 2 3 15 # DEBUG
@@ -54,16 +56,11 @@ check_distro etc/ncp.cfg || {
   exit 1;
 }
 
-mkdir -p /usr/local/etc/ncp-config.d/
-echo "rm -rf /usr/local/etc/ncp-config.d/" >>$USG_UNINSTALL_SCRIPT
+usg_mkdir -p /usr/local/etc/ncp-config.d/
 
-cp etc/ncp-config.d/nc-nextcloud.cfg /usr/local/etc/ncp-config.d/
-cp etc/library.sh /usr/local/etc/
-echo "rm /usr/local/etc/library.sh" >>$USG_UNINSTALL_SCRIPT
-
-cp etc/ncp.cfg /usr/local/etc/
-echo "rm /usr/local/etc/ncp.cfg" >>$USG_UNINSTALL_SCRIPT
-
+usg_cp etc/ncp-config.d/nc-nextcloud.cfg /usr/local/etc/ncp-config.d/
+usg_cp etc/library.sh /usr/local/etc/
+usg_cp etc/ncp.cfg /usr/local/etc/
 
 install_app    lemp.sh
 #install_app    bin/ncp/CONFIG/nc-nextcloud.sh

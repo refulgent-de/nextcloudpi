@@ -8,14 +8,15 @@
 # More at ownyourbits.com
 #
 
+source etc/uninstaller-library.sh #US
+
 NCPCFG=${NCPCFG:-/usr/local/etc/ncp.cfg}
 CFGDIR=/usr/local/etc/ncp-config.d
 BINDIR=/usr/local/bin/ncp
 BINDIR=/usr/local/bin/ncp
 
 command -v jq &>/dev/null || {
-  apt-get update
-  apt-get install -y --no-install-recommends jq
+  usg_install jq
 }
 
 [[ -f "$NCPCFG" ]] && {
