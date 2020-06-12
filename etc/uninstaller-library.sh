@@ -47,7 +47,7 @@ usg_removeTrailingSlash() {
 
   # Author: github.com/edannenberg
   [[ "${pathString}" == */ ]] && pathString="${pathString: : -1}"
-  
+
   echo "$pathString"
 }
 
@@ -92,14 +92,14 @@ usg_install() {
 }
 
 usg_mkdir() {
-  [[ ! -d "$1" ]] &&
-    echo "rm -rf $1" >> $USG_UNINSTALL_SCRIPT
+  [ ! -d "$1" ] &&
+    echo "rm -rf $1" >>$USG_UNINSTALL_SCRIPT
   #mkdir -p "$1"
 }
 
 usg_touch() {
   [[ ! -f "$1" ]] &&
-    echo "rm $1" >> $USG_UNINSTALL_SCRIPT
+    echo "rm $1" >>$USG_UNINSTALL_SCRIPT
   #touch "$1"
 }
 
@@ -110,6 +110,26 @@ usg_cp() {
     echo "rm $targetFile" >>$USG_UNINSTALL_SCRIPT
   #cp $1 $2
 }
+
+ # Packagename Question/Name Question-Type Response
+
+
+usg_setDebConfAnswer() {
+  echo "echo PURGE | debconf-communicate $1" >>$USG_UNINSTALL_SCRIPT
+  #debconf-set-selections <<< "$1 $2 $3 $4"
+}
+
+#usg_getDebConfValue() {
+#  echo $(debconf-get-selections | grep ^$1)
+#}
+
+#usg_eraseDebConf() {
+#  echo PURGE | debconf-communicate $1
+#}
+
+
+
+
 
 usg_finalize() {
   echo -en "\n" >> $USG_UNINSTALL_SCRIPT

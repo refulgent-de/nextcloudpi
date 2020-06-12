@@ -35,19 +35,20 @@ install() {
                             php${PHPVER}-mbstring php${PHPVER}-xml php${PHPVER}-zip php${PHPVER}-fileinfo php${PHPVER}-ldap \
                             php${PHPVER}-intl php${PHPVER}-bz2 php${PHPVER}-json
 
-  usg_mkdir /run/php
+  usg_mkdir "/run/php"
 
   # mariaDB password
-  usg_touch /root/.my.cnf
+  usg_touch "/root/.my.cnf"
   #echo -e "[client]\npassword=$DBPASSWD" > /root/.my.cnf # TODO diff # DEBUG
   #chmod 600 /root/.my.cnf
 
-  # http://manpages.ubuntu.com/manpages/cosmic/de/man1/debconf-set-selections.1.html
+  usg_setDebConfAnswer mariadb-server-5.5 mysql-server/root_password password $DBPASSWD
+  #debconf-set-selections <<< "mariadb-server-5.5 mysql-server/root_password_again password $DBPASSWD"
+  usg_install mariadb-server php${PHPVER}-mysql
+  usg_mkdir "/run/mysqld"
+  chown mysql "/run/mysqld"
 }
-
-
-#    debconf-set-selections <<< "mariadb-server-5.5 mysql-server/root_password password $DBPASSWD"
-#    debconf-set-selections <<< "mariadb-server-5.5 mysql-server/root_password_again password $DBPASSWD"
+#    
 #    $APTINSTALL mariadb-server php${PHPVER}-mysql
 #    mkdir -p /run/mysqld
 #    chown mysql /run/mysqld
